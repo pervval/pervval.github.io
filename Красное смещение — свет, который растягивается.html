@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Красное смещение — свет, который растягивается</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#000;--fg:#e8eaf0;--mut:#8b93a7;--card:#0c0f18;--line:#222a3d;--r:#ff4d5e;--b:#4da3ff;--v:#a46bff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:60px}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.65 Manrope,system-ui,sans-serif}
+h1,h2,h3{font-family:Unbounded,Manrope,sans-serif;margin:0}
+header.nav{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;gap:4px;overflow-x:auto;padding:10px 12px}
+header.nav a{color:var(--mut);text-decoration:none;font-size:.85rem;white-space:nowrap;padding:4px 10px;border-radius:20px}
+header.nav a:hover{color:#fff;box-shadow:0 0 12px var(--v)}
+#hero{position:relative;min-height:88vh;display:grid;place-items:center;text-align:center;padding:24px;overflow:hidden}
+#sky{position:absolute;inset:0;width:100%;height:100%}
+#hero div{position:relative}
+#hero h1{font-size:clamp(2rem,8vw,5.2rem);line-height:1.05;background:linear-gradient(90deg,var(--b),var(--v),var(--r),var(--b));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sh 8s linear infinite;filter:drop-shadow(0 0 22px rgba(164,107,255,.5))}
+@keyframes sh{to{background-position:300% 0}}
+#hero p{max-width:640px;margin:18px auto;color:var(--mut);font-size:1.1rem}
+.btn{display:inline-block;color:#fff;text-decoration:none;border:1px solid var(--v);padding:10px 22px;border-radius:30px;box-shadow:0 0 18px rgba(164,107,255,.45)}
+main{max-width:860px;margin:auto;padding:0 16px}
+section{padding:54px 0;border-top:1px solid var(--line)}
+h2{font-size:clamp(1.4rem,4.5vw,2.1rem);margin-bottom:6px;text-shadow:0 0 20px rgba(255,77,94,.55)}
+h2 span{color:var(--r)}
+.lead{color:var(--mut);margin:0 0 18px}
+h3{font-size:1.05rem;margin:22px 0 6px;color:#fff}
+.f{background:#10131f;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:12px 0;font-size:1.05rem;text-align:center;color:#ffd9dd;overflow-x:auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:14px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;transition:.25s}
+.card:hover{border-color:var(--v);box-shadow:0 0 22px rgba(164,107,255,.3);transform:translateY(-3px)}
+.card b{color:#fff}.tag{font:600 .72rem Manrope;color:var(--r);letter-spacing:.08em;text-transform:uppercase}
+.lab{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin:18px 0;box-shadow:0 0 30px rgba(77,163,255,.08)}
+canvas.a{width:100%;background:#03050b;border-radius:10px;display:block}
+label{display:block;margin:8px 0 0;font-size:.92rem;color:var(--mut)}label b{color:#fff}
+input[type=range]{width:100%;accent-color:var(--r)}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+button{background:#141a2b;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;font-size:.88rem}
+button.on{background:var(--v);border-color:var(--v);color:#fff}
+.out{background:#080b14;border-radius:8px;padding:8px 10px;margin-top:8px;font-size:.9rem}
+small{color:var(--mut);display:block;margin-top:6px;font-size:.82rem;line-height:1.45}
+#gl{position:relative;height:400px;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#000;touch-action:none}
+#gl canvas{width:100%;height:100%;display:block}#gl .tip{position:absolute;left:12px;bottom:10px;font-size:.82rem;color:var(--mut)}
+table{width:100%;border-collapse:collapse;font-size:.92rem}td,th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}th{color:var(--r)}
+.ph{height:110px;border-radius:10px;margin-bottom:10px;background:radial-gradient(circle at 30% 40%,#ff4d5e55,transparent 40%),radial-gradient(circle at 70% 60%,#4da3ff55,transparent 45%),#06080f}
+a{color:var(--b)}footer{padding:30px 16px 60px;text-align:center;color:var(--mut);font-size:.85rem}
+</style></head><body>
+<header class="nav"><a href="#what">Что это</a><a href="#sound">Звук</a><a href="#sto">СТО</a><a href="#light">Свет</a><a href="#cosmos">Космос</a><a href="#earth">Земля</a><a href="#facts">Факты</a><a href="#nasa">NASA</a></header>
+
+<div id="hero"><canvas id="sky"></canvas><div>
+<h1>КРАСНОЕ<br>СМЕЩЕНИЕ</h1>
+<p>Как свет далёких звёзд рассказывает нам о скорости, времени и расширении самой Вселенной.</p>
+<a class="btn" href="#what">Начать путешествие ↓</a></div></div>
+
+<main>
+<section id="what"><h2>Что такое <span>красное смещение</span></h2>
+<p class="lead">Если источник волны удаляется, наблюдаемая длина волны больше, чем излучённая. Для света это сдвиг к красному краю спектра.</p>
+<div class="f">z = (λ<sub>набл</sub> − λ<sub>0</sub>) / λ<sub>0</sub> &nbsp;&nbsp; z &gt; 0 — красное, z &lt; 0 — синее смещение</div>
+<div class="grid">
+<div class="card"><span class="tag">1 · Доплеровское</span><p>Источник движется в пространстве. Звёзды в двойных системах, галактики в скоплениях.</p></div>
+<div class="card"><span class="tag">2 · Космологическое</span><p>Растягивается само пространство, а вместе с ним и световая волна: 1 + z = a<sub>сейчас</sub>/a<sub>тогда</sub>.</p></div>
+<div class="card"><span class="tag">3 · Гравитационное</span><p>Свет теряет энергию, выбираясь из гравитационной ямы. У Солнца z ≈ 2·10⁻⁶.</p></div></div>
+<h3>Откуда мы знаем, что линия сдвинулась?</h3>
+<p>Каждый химический элемент оставляет в спектре «отпечатки пальцев» — линии на строго определённых длинах волн (например, Hα водорода 656,3 нм). Если весь узор сдвинут на одну и ту же долю длины волны, значит, источник движется или пространство растянулось.</p></section>
+
+<section id="sound"><h2>Сначала <span>звук</span></h2>
+<p class="lead">Звук идёт по среде (воздуху), поэтому важно, кто движется: источник или приёмник.</p>
+<div class="f">f = f₀ · c / (c − v<sub>ист</sub>) &nbsp;(приближается) &nbsp;|&nbsp; f = f₀ · (c + v<sub>пр</sub>) / c &nbsp;(приёмник приближается)</div>
+<div class="lab"><canvas class="a" id="c0" width="720" height="240"></canvas>
+<label>Скорость источника / скорость звука: <b id="t0"></b><input id="v0" type="range" min="0" max="150" value="50"></label>
+<div class="out" id="o0"></div>
+<small>Каждое кольцо — гребень волны, испущенный в своей точке. Впереди волны сжимаются (тон выше), позади растягиваются. При v ≥ c — ударная волна (конус Маха).</small></div>
+<p>Скорая (25 м/с, 700 Гц): приближаясь, она звучит на ≈756 Гц, удаляясь — на ≈652 Гц. Разница — около полутона.</p></section>
+
+<section id="sto"><h2>СТО за <span>две минуты</span></h2>
+<p class="lead">Свету не нужна среда, и все наблюдатели измеряют его скорость одинаковой.</p>
+<div class="grid">
+<div class="card"><span class="tag">Постулат 1</span><p>Законы физики одинаковы во всех инерциальных системах.</p></div>
+<div class="card"><span class="tag">Постулат 2</span><p>Скорость света c = 299 792 458 м/с одинакова для всех наблюдателей.</p></div></div>
+<div class="f">γ = 1/√(1 − β²), &nbsp; Δt = γ·Δt₀, &nbsp; l = l₀/γ</div>
+<table><tr><th>β = v/c</th><th>0,1</th><th>0,5</th><th>0,9</th><th>0,99</th></tr><tr><td>γ</td><td>1,005</td><td>1,155</td><td>2,294</td><td>7,09</td></tr></table>
+<p>Вывод замедления времени: в «световых часах» фотон между зеркалами для внешнего наблюдателя идёт по наклонной и проходит больший путь с той же скоростью, поэтому «тик» длится дольше.</p></section>
+
+<section id="light"><h2>Свет: <span>релятивистский</span> Доплер</h2>
+<p class="lead">Результат зависит только от относительной скорости и от угла θ между скоростью источника и направлением на наблюдателя.</p>
+<div class="f">f = f₀ / [γ(1 − β cosθ)] &nbsp; θ = 0° → √((1+β)/(1−β)) &nbsp; θ = 180° → √((1−β)/(1+β))</div>
+<div class="lab"><canvas class="a" id="c1" width="720" height="240"></canvas>
+<label>β = v/c: <b id="t1"></b><input id="v1" type="range" min="0" max="990" value="300"></label>
+<label>Угол θ: <b id="s1"></b><input id="a1" type="range" min="0" max="180" value="180"></label>
+<div class="out" id="o1"></div>
+<small>Линия — Hα (656,3 нм) на фоне видимого спектра. При θ = 90° остаётся красное смещение — поперечный эффект, возникающий только из-за замедления времени. Для звука его нет.</small></div>
+
+<h3>Цвет звезды при разных направлениях</h3>
+<div class="lab"><canvas class="a" id="c3" width="720" height="300"></canvas>
+<label>β = v/c: <b id="t3"></b><input id="v3" type="range" min="0" max="990" value="500"></label>
+<label>Угол θ: <b id="s3"></b><input id="a3" type="range" min="0" max="180" value="0"></label>
+<div class="row"><button data-a="0">К нам</button><button data-a="90">Поперёк</button><button data-a="180">От нас</button><button id="sw">▶ Автоповорот</button></div>
+<div class="out" id="o3"></div>
+<small>Для светящегося тела смещённый спектр равен спектру с температурой T·D, где D = 1/[γ(1 − β cosθ)]. Справа сверху: цвет в покое и наблюдаемый цвет (Солнце, 5800 К). Яркость показана условно.</small></div>
+
+<h3>Машина и светофор</h3>
+<div class="lab"><canvas class="a" id="c4" width="720" height="290"></canvas>
+<div class="row" id="lcol"><button class="on" data-l="650">Красный 650 нм</button><button data-l="590">Жёлтый 590 нм</button><button data-l="550">Зелёный 550 нм</button></div>
+<div class="row" id="ldir"><button class="on" data-d="1">К светофору</button><button data-d="-1">От светофора</button></div>
+<label>β = v/c: <b id="t4"></b><input id="v4" type="range" min="0" max="500" value="0"></label>
+<div class="row"><button id="k90">Реальные 90 км/ч</button><button id="kg">Красный → зелёный</button></div>
+<div class="out" id="o4"></div>
+<small>Чтобы красный стал зелёным, нужно β ≈ 0,166 (около 50 000 км/с). Движение на экране условное.</small></div></section>
+
+<section id="cosmos"><h2>Расширяющаяся <span>Вселенная</span></h2>
+<p class="lead">Галактики не разлетаются «сквозь» пространство: растягивается само пространство.</p>
+<div class="f">v = H₀ · d &nbsp;&nbsp; H₀ ≈ 70 км/с на Мпк</div>
+<div class="lab"><canvas class="a" id="c5" width="720" height="240"></canvas>
+<label>Масштаб Вселенной a: <b id="t5"></b><input id="v5" type="range" min="100" max="400" value="100"></label>
+<div class="out" id="o5"></div>
+<small>Сверху: галактики на «резиночке» — расстояния растут. Снизу: волна света растягивается вместе с пространством, 1 + z = a.</small></div>
+<div class="grid">
+<div class="card"><span class="tag">Реликтовое излучение</span><p>Родилось при z ≈ 1100 и растянулось от видимого света до микроволн (T ≈ 2,725 К).</p></div>
+<div class="card"><span class="tag">Джеймс Уэбб</span><p>Самые далёкие галактики имеют z ≈ 14: их ультрафиолет мы ловим в инфракрасном диапазоне.</p></div></div></section>
+
+<section id="earth"><h2>Земля, <span>эклиптика</span> и 3D</h2>
+<p class="lead">Земля летит по орбите со скоростью 29,8 км/с — это ±0,065 нм для линии Hα. Астрономам приходится вычитать это при каждом измерении.</p>
+<div id="gl"><div class="tip">Тяните мышью/пальцем, чтобы вращать. Зелёная стрелка — скорость Земли.</div></div>
+<div class="lab"><canvas class="a" id="c2" width="720" height="290"></canvas>
+<label>Эклиптическая широта звезды: <b id="t2"></b><input id="v2" type="range" min="0" max="90" value="0"></label>
+<div class="out" id="o2"></div>
+<small>Слева — вид сверху на орбиту, справа — лучевая скорость звезды за год. У полюса эклиптики в первом порядке смещения нет. Метод лучевых скоростей: Юпитер раскачивает Солнце на ≈12,5 м/с, Земля — на ≈9 см/с.</small></div>
+<div class="grid">
+<div class="card"><span class="tag">Аберрация</span><p>Из-за движения Земли звёзды смещаются на ≈20,5″ — открытие Брэдли, 1725 год.</p></div>
+<div class="card"><span class="tag">Диполь реликта</span><p>Движение Солнца на ≈370 км/с даёт разницу температуры ≈3,4 мК между сторонами неба.</p></div></div></section>
+
+<section id="facts"><h2>Истории и <span>факты</span></h2>
+<p class="lead">Как исследовали это явление.</p>
+<div class="grid">
+<div class="card"><span class="tag">1845 · поезд</span><p>Бейс-Баллот проверил Доплера оркестром: трубачи играли одну ноту на открытой платформе поезда, а музыканты с абсолютным слухом слушали на перроне.</p></div>
+<div class="card"><span class="tag">Ошибка Доплера</span><p>Доплер полагал, что цвета звёзд объясняются их движением. Это неверно (цвет — температура), но сам принцип оказался верным.</p></div>
+<div class="card"><span class="tag">1868 · Сириус</span><p>Уильям Хаггинс впервые измерил по линиям спектра лучевую скорость звезды — Сириуса.</p></div>
+<div class="card"><span class="tag">1912 · Андромеда</span><p>Весто Слайфер обнаружил, что Андромеда не краснеет, а <b>синеет</b>: она летит к нам (~300 км/с) и столкнётся с Млечным Путём через миллиарды лет.</p></div>
+<div class="card"><span class="tag">1927–1929</span><p>Леметр теоретически, а Хаббл по наблюдениям показали связь красного смещения с расстоянием. Расширение Вселенной было открыто.</p></div>
+<div class="card"><span class="tag">1963 · Квазар</span><p>Маартен Шмидт понял, что загадочные линии у 3C 273 — это обычный водород со смещением z ≈ 0,16.</p></div>
+<div class="card"><span class="tag">1938 · Айвс–Стилвелл</span><p>Опыт с быстрыми атомами водорода подтвердил поперечный эффект Доплера — предсказание СТО.</p></div>
+<div class="card"><span class="tag">1959 · Паунд–Ребка</span><p>На башне Гарварда высотой 22,5 м измерили гравитационное красное смещение (~10⁻¹⁵).</p></div>
+<div class="card"><span class="tag">1995 · Экзопланеты</span><p>Майор и Кело нашли планету у 51 Пегаса по колебаниям лучевой скорости звезды (Нобелевская премия 2019).</p></div>
+<div class="card"><span class="tag">Напряжённость Хаббла</span><p>Разные способы измерения дают H₀ ≈ 67 и ≈ 73 км/с/Мпк. Расхождение — одна из главных загадок космологии.</p></div>
+<div class="card"><span class="tag">Эффект в быту</span><p>Полицейские радары, доплеровские метеорадары и УЗИ-допплерография работают на том же принципе.</p></div></div></section>
+
+<section id="nasa"><h2>Фото <span>космоса</span></h2>
+<p class="lead">Настоящие снимки NASA и ESA — по ссылкам (эта страница не может встроить внешние изображения).</p>
+<div class="grid">
+<a class="card" style="text-decoration:none;color:inherit" href="https://webbtelescope.org" target="_blank" rel="noopener"><div class="ph"></div><b>Телескоп Уэбб (STScI)</b><br>Далёкие галактики и красные смещения.</a>
+<a class="card" style="text-decoration:none;color:inherit" href="https://esahubble.org" target="_blank" rel="noopener"><div class="ph"></div><b>ESA/Hubble</b><br>Галерея галактик и скоплений.</a>
+<a class="card" style="text-decoration:none;color:inherit" href="https://apod.nasa.gov" target="_blank" rel="noopener"><div class="ph"></div><b>NASA APOD</b><br>Астрономическая картинка дня.</a>
+<a class="card" style="text-decoration:none;color:inherit" href="https://science.nasa.gov" target="_blank" rel="noopener"><div class="ph"></div><b>NASA Science</b><br>Поиск «redshift».</a></div>
+<h3>Что читать дальше</h3>
+<p>Википедия: «Эффект Доплера», «Красное смещение», «Аберрация света». Фейнмановские лекции: feynmanlectures.caltech.edu. HyperPhysics: hyperphysics.phy-astr.gsu.edu. Ландау, Лифшиц «Теория поля» §§ 47–48.</p>
+<small>Адреса даны по памяти — проверьте, что они открываются. Рекорды z и значение H₀ периодически уточняются.</small></section>
+</main>
+<footer>Сделано для школьного проекта по физике, 11 класс · свет не врёт</footer>
+
+<script>
+const $=i=>document.getElementById(i),X=i=>$(i).getContext('2d');
+function bb(T){T=Math.min(40000,Math.max(1000,T))/100;const c=v=>Math.max(0,Math.min(255,v))|0;
+ return [c(T<=66?255:329.698727446*Math.pow(T-60,-.1332047592)),c(T<=66?99.4708025861*Math.log(T)-161.1195681661:288.1221695283*Math.pow(T-60,-.0755148492)),c(T>=66?255:T<=19?0:138.5177312231*Math.log(T-10)-305.0447927307)];}
+function nm(l){let r=0,g=0,b=0;if(l<380||l>780)return null;
+ if(l<440){r=(440-l)/60;b=1}else if(l<490){g=(l-440)/50;b=1}else if(l<510){g=1;b=(510-l)/20}else if(l<580){r=(l-510)/70;g=1}else if(l<645){r=1;g=(645-l)/65}else r=1;
+ const f=l<420?.3+.7*(l-380)/40:l>700?.3+.7*(780-l)/80:1;return[255*r*f|0,255*g*f|0,255*b*f|0];}
+const rgb=c=>`rgb(${c})`,W='#fff';
+function spec(x,x0,x1,y,h,L0,L){const m=l=>x0+(l-300)/600*(x1-x0);for(let l=380;l<780;l+=2){x.fillStyle=rgb(nm(l));x.fillRect(m(l),y,m(l+2)-m(l)+1,h);}
+ x.fillStyle=W;x.font='12px Manrope,sans-serif';[400,500,600,700].forEach(l=>x.fillText(l,m(l)-9,y+h+14));
+ x.fillRect(m(L0)-1,y-8,2,h+16);x.fillText('покой',m(L0)-16,y-12);
+ if(L>=300&&L<=900){x.fillStyle='#ffd24a';x.fillRect(m(L)-2,y-8,4,h+16);x.fillText('видим',m(L)-14,y+h+30);}}
+// 0 sound
+let w0=[],sx=100,ac=0;
+function f0(dt){const x=X('c0'),m=$('v0').value/100;$('t0').textContent=m.toFixed(2)+' c';sx+=m*100*dt;ac+=dt;if(ac>.25){ac=0;w0.push({x:sx,t:0});}
+ w0.forEach(w=>w.t+=dt);w0=w0.filter(w=>w.t*100<500);if(sx>620){sx=100;w0=[];}
+ x.fillStyle='#03050b';x.fillRect(0,0,720,240);x.strokeStyle='#5ab0ff';w0.forEach(w=>{x.beginPath();x.arc(w.x,120,w.t*100,0,7);x.stroke();});
+ x.fillStyle='#ffb347';x.beginPath();x.arc(sx,120,7,0,7);x.fill();x.fillStyle=W;x.font='13px Manrope,sans-serif';x.fillText('A (впереди)',600,225);x.fillText('B (сзади)',10,225);
+ $('o0').innerHTML='A: f = <b>'+(m<1?(1/(1-m)).toFixed(2)+' f₀':'∞ — ударная волна')+'</b> &nbsp; B: f = <b>'+(1/(1+m)).toFixed(2)+' f₀</b>';}
+// 1 light
+function f1(){const x=X('c1'),be=$('v1').value/1e3,A=+$('a1').value,th=A*Math.PI/180,g=1/Math.sqrt(1-be*be);
+ $('t1').textContent=be.toFixed(3);$('s1').textContent=A+'°';const k=g*(1-be*Math.cos(th)),L=656.3*k;
+ x.fillStyle='#03050b';x.fillRect(0,0,720,240);spec(x,40,680,80,70,656.3,L);
+ $('o1').innerHTML='f/f₀ = <b>'+(1/k).toFixed(3)+'</b>, z = <b>'+(k-1).toFixed(3)+'</b> ('+(k>1?'красное':'синее')+' смещение), λ = '+L.toFixed(1)+' нм'+(L>780?' (ИК)':L<380?' (УФ)':'')+'. По «звуковой» формуле было бы '+(1/(1-be*Math.cos(th))).toFixed(3)+' — разницу даёт γ.';}
+// 3 star
+let sw=false,tt=0;
+document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{sw=false;$('sw').classList.remove('on');$('a3').value=b.dataset.a;});
+$('sw').onclick=()=>{sw=!sw;$('sw').classList.toggle('on',sw);};
+function f3(dt){tt+=dt;if(sw){let a=+$('a3').value+dt*30;if(a>180)a=0;$('a3').value=a;}
+ const x=X('c3'),be=$('v3').value/1e3,A=+$('a3').value,th=A*Math.PI/180,g=1/Math.sqrt(1-be*be),D=1/(g*(1-be*Math.cos(th))),T=5800*D,col=bb(T),c0=bb(5800);
+ $('t3').textContent=be.toFixed(3);$('s3').textContent=Math.round(A)+'°';
+ x.fillStyle='#03050b';x.fillRect(0,0,720,300);for(let i=0;i<50;i++){x.fillStyle='rgba(255,255,255,.3)';x.fillRect(i*137.5%720,i*71.3%300,1.5,1.5);}
+ const cx=300,cy=150,vx=Math.cos(th),vy=-Math.sin(th);x.strokeStyle='rgba(180,200,255,.4)';x.lineWidth=2;
+ for(let i=1;i<=6;i++){const s=i*14+(tt*60%14);x.beginPath();x.moveTo(cx-vx*s,cy-vy*s);x.lineTo(cx-vx*(s+6),cy-vy*(s+6));x.stroke();}
+ const R=34*Math.min(1.4,Math.max(.8,Math.pow(D,.6))),gr=x.createRadialGradient(cx,cy,2,cx,cy,R*2.6);gr.addColorStop(0,`rgba(${col},1)`);gr.addColorStop(.35,`rgba(${col},.55)`);gr.addColorStop(1,`rgba(${col},0)`);
+ x.fillStyle=gr;x.beginPath();x.arc(cx,cy,R*2.6,0,7);x.fill();x.fillStyle=rgb(col);x.beginPath();x.arc(cx,cy,R,0,7);x.fill();
+ x.setLineDash([5,5]);x.strokeStyle='#8aa';x.lineWidth=1;x.beginPath();x.moveTo(cx,cy);x.lineTo(620,cy);x.stroke();x.setLineDash([]);
+ x.strokeStyle='#5f5';x.lineWidth=3;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+vx*110,cy+vy*110);x.stroke();
+ x.fillStyle='#fc3';x.font='13px Manrope,sans-serif';x.fillText('θ='+Math.round(A)+'°',cx+66,cy-8-Math.sin(th/2)*20);x.fillStyle='#5f5';x.fillText('v',cx+vx*118,cy+vy*118);
+ x.font='30px sans-serif';x.fillStyle=W;x.fillText('🌍',625,cy+12);x.font='12px Manrope,sans-serif';x.fillText('мы',632,cy+32);
+ x.fillStyle=rgb(c0);x.fillRect(560,16,50,26);x.fillStyle=W;x.fillText('в покое',616,34);x.fillStyle=rgb(col);x.fillRect(560,50,50,26);x.fillStyle=W;x.fillText('мы видим',616,68);
+ const z=1/D-1;$('o3').innerHTML='D = <b>'+D.toFixed(3)+'</b>, T<sub>набл</sub> = '+Math.round(T)+' К, z = '+z.toFixed(3)+' → <b>'+(z>.02?'краснеет':z<-.02?'голубеет':'почти без смещения')+'</b>'+(A>=89&&A<=91?'<br>θ = 90°: поперечный эффект — красное смещение от замедления времени.':'');}
+// 4 car
+let L4=650,d4=1,cX=0,real=false;
+function tg(sel,fn){document.querySelectorAll(sel+' button').forEach(b=>b.onclick=()=>{fn(b);document.querySelectorAll(sel+' button').forEach(e=>e.classList.toggle('on',e===b));});}
+tg('#lcol',b=>L4=+b.dataset.l);tg('#ldir',b=>d4=+b.dataset.d);
+$('k90').onclick=()=>real=true;$('v4').oninput=()=>real=false;
+$('kg').onclick=()=>{L4=650;d4=1;real=false;const r=(650/550)**2;$('v4').value=Math.round((r-1)/(r+1)*1e3);document.querySelectorAll('#lcol button').forEach(e=>e.classList.toggle('on',e.dataset.l=='650'));document.querySelectorAll('#ldir button').forEach(e=>e.classList.toggle('on',e.dataset.d=='1'));};
+function f4(dt){const x=X('c4'),be=real?25/299792458:$('v4').value/1e3;$('t4').textContent=real?'8,3·10⁻⁸ (90 км/ч)':be.toFixed(3);
+ const k=Math.sqrt((1-d4*be)/(1+d4*be)),L=L4*k,col=nm(L);cX=(cX+dt*(40+(real?0:$('v4').value/3)))%720;
+ x.fillStyle='#03050b';x.fillRect(0,0,720,290);x.fillStyle='#1a2030';x.fillRect(0,190,720,40);
+ x.fillStyle='#555';x.fillRect(596,50,8,140);x.fillStyle='#111';x.fillRect(580,10,40,100);
+ for(let i=0;i<3;i++){x.fillStyle='#2a2a2a';x.beginPath();x.arc(600,30+i*30,11,0,7);x.fill();}
+ x.fillStyle=rgb(nm(L4));x.beginPath();x.arc(600,30+(L4==650?0:L4==590?1:2)*30,11,0,7);x.fill();
+ const px=d4==1?cX*.55:520-cX*.55;x.fillStyle='#3b82f6';x.fillRect(px,165,100,26);x.fillRect(px+20,146,55,22);x.fillStyle='#000';[20,78].forEach(o=>{x.beginPath();x.arc(px+o,192,9,0,7);x.fill();});
+ x.fillStyle=W;x.font='13px Manrope,sans-serif';x.fillText('Водитель видит:',16,22);
+ if(col){x.fillStyle=rgb(col);x.beginPath();x.arc(60,65,26,0,7);x.fill();}else{x.strokeStyle='#888';x.beginPath();x.arc(60,65,26,0,7);x.stroke();x.fillStyle='#888';x.fillText(L>780?'ИК':'УФ',52,70);}
+ spec(x,20,680,240,12,L4,L);
+ $('o4').innerHTML='λ<sub>набл</sub> = <b>'+(real?L.toFixed(6):L.toFixed(1))+' нм</b> (в покое '+L4+' нм)<br>'+(real?'Сдвиг ~'+Math.abs(L-L4).toExponential(1)+' нм: глазом не заметить, штраф за красный остаётся 🙂':col?'Цвет: '+(L<495?'синий':L<575?'зелёный':L<600?'жёлтый':L<=650?'оранжевый/красный':'тёмно-красный'):'Свет за пределами видимого ('+(L>780?'ИК':'УФ')+')');}
+// 5 expansion
+function f5(){const x=X('c5'),a=$('v5').value/100;$('t5').textContent=a.toFixed(2);x.fillStyle='#03050b';x.fillRect(0,0,720,240);
+ for(let i=0;i<9;i++){const px=360+(i-4)*50*a,py=50;if(px<0||px>720)continue;x.fillStyle=i==4?'#ffd24a':'#9cc';x.beginPath();x.arc(px,py,i==4?9:6,0,7);x.fill();}
+ x.fillStyle=W;x.font='12px Manrope,sans-serif';x.fillText('мы',350,78);
+ const lam=40*a,c=nm(450*a)||[120,0,0];x.strokeStyle=rgb(c);x.lineWidth=3;x.beginPath();for(let i=0;i<=720;i++){const y=160+26*Math.sin(2*Math.PI*i/lam);i?x.lineTo(i,y):x.moveTo(i,y);}x.stroke();
+ $('o5').innerHTML='1 + z = a → z = <b>'+(a-1).toFixed(2)+'</b>. Свет с λ = 450 нм приходит с λ = <b>'+(450*a).toFixed(0)+' нм</b>';}
+// 2 earth
+let ph=0;
+function f2(dt){ph=(ph+dt/6)%1;const x=X('c2'),bl=$('v2').value*Math.PI/180;$('t2').textContent=$('v2').value+'°';const V=29.78;
+ x.fillStyle='#03050b';x.fillRect(0,0,720,290);const cx=140,cy=145,R=95;x.strokeStyle='#445';x.beginPath();x.arc(cx,cy,R,0,7);x.stroke();
+ x.fillStyle='#ffd24a';x.shadowColor='#ffb347';x.shadowBlur=20;x.beginPath();x.arc(cx,cy,12,0,7);x.fill();x.shadowBlur=0;
+ const a=2*Math.PI*ph,ex=cx+R*Math.cos(a),ey=cy-R*Math.sin(a);x.fillStyle='#4aa3ff';x.beginPath();x.arc(ex,ey,6,0,7);x.fill();
+ x.strokeStyle='#4f4';x.beginPath();x.moveTo(ex,ey);x.lineTo(ex-Math.sin(a)*40,ey-Math.cos(a)*40);x.stroke();
+ x.strokeStyle=W;x.setLineDash([4,4]);x.beginPath();x.moveTo(cx+R+22,cy-110);x.lineTo(cx+R+22,cy+110);x.stroke();x.setLineDash([]);x.fillStyle=W;x.font='12px Manrope,sans-serif';x.fillText('к звезде →',cx+R-4,cy-114);
+ const gx=300,gw=400,gy=145,gh=100;x.strokeStyle='#556';x.strokeRect(gx,gy-gh,gw,2*gh);x.beginPath();x.moveTo(gx,gy);x.lineTo(gx+gw,gy);x.stroke();
+ x.strokeStyle='#ff7a59';x.beginPath();for(let i=0;i<=200;i++){const p=i/200,y=gy-Math.cos(bl)*Math.sin(2*Math.PI*p)*gh*.9;i?x.lineTo(gx+p*gw,y):x.moveTo(gx+p*gw,y);}x.stroke();
+ const cur=V*Math.cos(bl)*Math.sin(a);x.fillStyle=W;x.beginPath();x.arc(gx+ph*gw,gy-cur/V*gh*.9,5,0,7);x.fill();x.fillText('+30 км/с',gx+4,gy-gh+14);x.fillText('−30 км/с',gx+4,gy+gh-6);
+ $('o2').innerHTML='Лучевая скорость: <b>'+cur.toFixed(1)+' км/с</b>; Δλ(Hα) = <b>'+(656.3*cur/299792.458).toFixed(4)+' нм</b>; амплитуда ±'+(656.3*V*Math.cos(bl)/299792.458).toFixed(3)+' нм. Эффект 2-го порядка β²/2 ≈ 5·10⁻⁹.';}
+// loop
+const FN=[['c0',f0],['c1',f1],['c3',f3],['c4',f4],['c5',f5],['c2',f2]];let last=performance.now();
+(function lp(n){const dt=Math.min(.05,(n-last)/1e3);last=n;FN.forEach(([id,f])=>{const r=$(id).getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight)f(dt);});requestAnimationFrame(lp);})(last);
+// hero sky
+(function(){const c=$('sky'),x=c.getContext('2d');let S=[];function rs(){c.width=c.offsetWidth;c.height=c.offsetHeight;S=Array.from({length:140},()=>({x:Math.random()*c.width,y:Math.random()*c.height,z:Math.random()*.8+.2,p:Math.random()*6}));}
+ rs();addEventListener('resize',rs);(function d(t){x.clearRect(0,0,c.width,c.height);S.forEach(s=>{s.x-=s.z*.25;if(s.x<0)s.x=c.width;const k=Math.sin(t/900+s.p),col=s.x<c.width*.5?`rgba(255,${120+60*k|0},120,`:`rgba(140,${180+40*k|0},255,`;x.fillStyle=col+(.5+.4*k)+')';x.beginPath();x.arc(s.x,s.y,s.z*1.6,0,7);x.fill();});requestAnimationFrame(d);})(0);})();
+// 3D
+(function(){const el=$('gl');if(!window.THREE){el.insertAdjacentHTML('beforeend','<p style="padding:20px">3D не загрузилось.</p>');return;}
+ const r=new THREE.WebGLRenderer({antialias:true});el.appendChild(r.domElement);const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,1,.1,1000);
+ function rs(){r.setSize(el.clientWidth,el.clientHeight);cam.aspect=el.clientWidth/el.clientHeight;cam.updateProjectionMatrix();}rs();addEventListener('resize',rs);r.setPixelRatio(Math.min(2,devicePixelRatio));
+ const sg=new THREE.BufferGeometry(),p=[];for(let i=0;i<900;i++){const v=new THREE.Vector3().randomDirection().multiplyScalar(300+Math.random()*100);p.push(v.x,v.y,v.z);}
+ sg.setAttribute('position',new THREE.Float32BufferAttribute(p,3));sc.add(new THREE.Points(sg,new THREE.PointsMaterial({color:0xffffff,size:1.2})));
+ sc.add(new THREE.AmbientLight(0x333344));const L=new THREE.PointLight(0xffeedd,2,0,0);sc.add(L);
+ const sun=new THREE.Mesh(new THREE.SphereGeometry(5,32,32),new THREE.MeshBasicMaterial({color:0xffc84a}));sc.add(sun);
+ const cv=document.createElement('canvas');cv.width=cv.height=128;const g=cv.getContext('2d'),gr=g.createRadialGradient(64,64,4,64,64,64);gr.addColorStop(0,'rgba(255,200,80,.9)');gr.addColorStop(.4,'rgba(255,140,40,.35)');gr.addColorStop(1,'rgba(255,100,20,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);
+ const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),blending:THREE.AdditiveBlending,depthWrite:false}));gl.scale.set(30,30,1);sc.add(gl);
+ const P=[[.8,10,0xb0a090,.45],[1.3,15,0xe8c07a,.35],[1.4,21,0x4aa3ff,.28],[1.1,27,0xd9603b,.22],[3,40,0xd9b38c,.12]].map(([s,d,c,w],i)=>{const m=new THREE.Mesh(new THREE.SphereGeometry(s,24,24),new THREE.MeshStandardMaterial({color:c}));sc.add(m);
+  const pts=[];for(let k=0;k<=128;k++)pts.push(new THREE.Vector3(Math.cos(k/128*6.2832)*d,0,Math.sin(k/128*6.2832)*d));sc.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:i==2?0x4da3ff:0x2a3350})));return{m,d,w,a:i*1.7};});
+ const ar=new THREE.ArrowHelper(new THREE.Vector3(1,0,0),new THREE.Vector3(),9,0x55ff66,2.5,1.5);sc.add(ar);
+ let th=.6,ph=.9,dist=70,dr=false,lx=0,ly=0;const d=r.domElement;
+ d.onpointerdown=e=>{dr=true;lx=e.clientX;ly=e.clientY;d.setPointerCapture(e.pointerId)};d.onpointerup=()=>dr=false;
+ d.onpointermove=e=>{if(!dr)return;th-=(e.clientX-lx)*.008;ph=Math.max(.2,Math.min(1.5,ph-(e.clientY-ly)*.006));lx=e.clientX;ly=e.clientY;};
+ d.onwheel=e=>{e.preventDefault();dist=Math.max(30,Math.min(130,dist+e.deltaY*.05));};
+ let t=0;(function an(){t+=.016;P.forEach(o=>{const a=o.a+t*o.w;o.m.position.set(Math.cos(a)*o.d,0,Math.sin(a)*o.d);o.m.rotation.y+=.01;});
+  const E=P[2];ar.position.copy(E.m.position);ar.setDirection(new THREE.Vector3(-Math.sin(E.a+t*E.w),0,Math.cos(E.a+t*E.w)));sun.rotation.y+=.003;
+  cam.position.set(dist*Math.sin(th)*Math.cos(ph),dist*Math.sin(ph),dist*Math.cos(th)*Math.cos(ph));cam.lookAt(0,0,0);r.render(sc,cam);requestAnimationFrame(an);})();})();
+</script></body></html>
